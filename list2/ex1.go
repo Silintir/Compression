@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	bst "github.com/me/Compression-and-Methods-of-Coding/binary_search_tree"
 )
 
 func check(e error) {
@@ -36,9 +38,11 @@ func main() {
 }
 
 func classicHuffman(reps map[byte]int, counter int) {
-	probability := make(map[byte]float64)
+	probability := make(bst.Nodes, 0, len(reps))
 	for k, v := range reps {
-		probability[k] = float64(v / counter)
-
+		probability = append(probability, bst.MakeNode(float64(v/counter), k))
 	}
+
+	//n1, n2 := probability[0], probability[1]
+
 }

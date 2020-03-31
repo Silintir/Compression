@@ -13,6 +13,26 @@ type Node struct {
 	Parent *Node
 }
 
+// Nodes : type for array of Nodes, to wrap the type for some array specific functions
+type Nodes []*Node
+
+// FindMin - finds the node with the smallest peobablity
+func (n Nodes) FindMin() *Node {
+	min := n[0]
+	for _, node := range n {
+		if node.Value < min.Value {
+			min = node
+		}
+	}
+	return min
+}
+
+// Remove element from slice elegant way
+func (n Nodes) Remove(s []int, i int) []int {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
 var nullNode Node = Node{Value: -1, Symbol: 0, Left: nil, Right: nil, Parent: nil}
 
 // MakeNode : wrapper to make creating nodes more convinient
