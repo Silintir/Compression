@@ -2,22 +2,24 @@ package binarysearchtree
 
 import (
 	"fmt"
+	"time"
 )
 
 // Node : Basic node to build BST
 type Node struct {
-	Value  float64
-	Symbol int16
-	Left   *Node
-	Right  *Node
-	Parent *Node
+	Value    float64
+	Symbol   int16
+	Codeword string
+	Left     *Node
+	Right    *Node
+	Parent   *Node
 }
 
-var nullNode Node = Node{Value: -1, Symbol: 0, Left: nil, Right: nil, Parent: nil}
+var nullNode Node = Node{Value: -1, Symbol: -2, Codeword: "", Left: nil, Right: nil, Parent: nil}
 
 // MakeNode : wrapper to make creating nodes more convinient
 func MakeNode(v float64, symbol int16) *Node {
-	return &Node{Value: v, Symbol: symbol, Left: &nullNode, Right: &nullNode, Parent: &nullNode}
+	return &Node{Value: v, Symbol: symbol, Codeword: "", Left: &nullNode, Right: &nullNode, Parent: &nullNode}
 }
 
 // Insert : node to preexisting tree/root node
@@ -42,9 +44,10 @@ func (root *Node) Print() {
 }
 
 func showInOrder(root *Node) {
-	if root != &nullNode {
+	if root.Symbol != -2 {
 		showInOrder(root.Left)
-		fmt.Println(root.Value)
+		fmt.Println(root.Value, " ", root.Symbol)
+		time.Sleep(time.Second)
 		showInOrder(root.Right)
 	}
 }

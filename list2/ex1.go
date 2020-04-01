@@ -34,24 +34,50 @@ func main() {
 		counter++
 	}
 
-	classicHuffman(repetitions, counter).Print()
+	fmt.Print(staticHuffman(repetitions, counter))
 
 }
 
-func classicHuffman(reps map[byte]float64, counter float64) *bst.Node {
+func staticHuffman(reps map[byte]float64, counter float64) map[byte]string {
 	ns := make(bst.Nodes, 0, len(reps))
+	fmt.Println(reps)
 	for k, v := range reps {
 		ns = append(ns, bst.MakeNode(v/counter, int16(k)))
 	}
+	//debug
+	for i := 0; i < len(ns); i++ {
+		fmt.Println(ns[i].Value)
+	}
+
 	var newRoot, n1, n2 *bst.Node
 	for fin := false; !fin; fin = (len(ns) == 1) {
+		// TODO: POP2MIN not working correctly
 		ns, n1, n2 = ns.Pop2Min()
+		fmt.Println(n1.Value, " ", n2.Value)
 		newRoot = bst.MakeNode(n1.Value+n2.Value, -1)
 		newRoot.Insert(n1)
 		newRoot.Insert(n2)
 		ns = append(ns, newRoot)
 
 	}
+	ns[0].Print()
 
-	return ns[0]
+	var codewordsCreate func(parent *bst.Node)
+	codeWords := make(map[byte]string)
+
+	codewordsCreate = func(parent *bst.Node) {
+		if parent.Symbol == -1 {
+			parent.Left.Codeword = parent.Codeword + "0"
+			parent.Right.Codeword = parent.Codeword + "1"
+			fmt.Println("Aaaa")
+			codewordsCreate(parent.Left)
+			codewordsCreate(parent.Right)
+		} else {
+			codeWords[byte(parent.Symbol)] = parent.Codeword
+		}
+	}
+
+	codewordsCreate(ns[0])
+
+	return codeWords
 }
