@@ -2,7 +2,6 @@ package binarysearchtree
 
 import (
 	"fmt"
-	"time"
 )
 
 // Node : Basic node to build BST
@@ -28,7 +27,7 @@ func (root *Node) Insert(node *Node) {
 	var parent *Node = nil
 	for ok := true; ok; ok = (*curr != &nullNode) {
 		parent = *curr
-		if node.Symbol < parent.Symbol {
+		if node.Value < parent.Value {
 			curr = &parent.Left
 		} else {
 			curr = &parent.Right
@@ -47,7 +46,6 @@ func showInOrder(root *Node) {
 	if root.Symbol != -2 {
 		showInOrder(root.Left)
 		fmt.Println(root.Value, " ", root.Symbol)
-		time.Sleep(time.Second)
 		showInOrder(root.Right)
 	}
 }
@@ -76,13 +74,9 @@ func (ns Nodes) PopMin() (Nodes, *Node) {
 
 // Pop2Min - pop 2 smallest elements from slice elegant way
 func (ns Nodes) Pop2Min() (Nodes, *Node, *Node) {
-	minIndex := ns.FindIndexMin()
-	min := ns[minIndex]
-	ns[minIndex] = ns[len(ns)-1]
+	var min1, min2 *Node
+	ns, min1 = ns.PopMin()
+	ns, min2 = ns.PopMin()
 
-	minIndex2 := ns.FindIndexMin()
-	min2 := ns[minIndex2]
-	ns[minIndex2] = ns[len(ns)-2]
-
-	return ns[:len(ns)-2], min, min2
+	return ns, min1, min2
 }

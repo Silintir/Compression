@@ -6,6 +6,7 @@ import (
 	"os"
 
 	bst "github.com/me/Compression-and-Methods-of-Coding/binary_search_tree"
+	bits "github.com/me/Compression-and-Methods-of-Coding/bits"
 )
 
 func check(e error) {
@@ -33,51 +34,67 @@ func main() {
 		repetitions[curr[0]]++
 		counter++
 	}
+	file.Close()
 
-	fmt.Print(staticHuffman(repetitions, counter))
+	compressedAlphabet := staticHuffman(repetitions, counter)
+	bitString := ""
+	bytesRes := make([]byte, 0)
+	fmt.Println(compressedAlphabet)
+	file, err = os.Open(os.Args[1])
+	check(err)
 
+	for {
+		_, err = file.Read(curr)
+		if err != nil && err == io.EOF {
+			break
+		}
+		bitString += compressedAlphabet[curr[0]]
+		if len(bitString)%8 == 0 {
+			bytesRes = append(bytesRes, bits.Bits2bytes(bitString)...)
+			bitString = ""
+		}
+	}
+	if len(bitString) != 0 {
+		for ok := true; ok; ok = (len(bitString) != 8) {
+			bitString = "0" + bitString
+		}
+		bytesRes = append(bytesRes, bits.Bits2bytes(bitString)...)
+	}
+
+	fmt.Println(bytesRes)
 }
 
 func staticHuffman(reps map[byte]float64, counter float64) map[byte]string {
 	ns := make(bst.Nodes, 0, len(reps))
-	fmt.Println(reps)
 	for k, v := range reps {
 		ns = append(ns, bst.MakeNode(v/counter, int16(k)))
-	}
-	//debug
-	for i := 0; i < len(ns); i++ {
-		fmt.Println(ns[i].Value)
 	}
 
 	var newRoot, n1, n2 *bst.Node
 	for fin := false; !fin; fin = (len(ns) == 1) {
-		// TODO: POP2MIN not working correctly
 		ns, n1, n2 = ns.Pop2Min()
-		fmt.Println(n1.Value, " ", n2.Value)
 		newRoot = bst.MakeNode(n1.Value+n2.Value, -1)
-		newRoot.Insert(n1)
-		newRoot.Insert(n2)
+		newRoot.Left = n1
+		newRoot.Right = n2
 		ns = append(ns, newRoot)
 
 	}
-	ns[0].Print()
 
-	var codewordsCreate func(parent *bst.Node)
+	var makeBitsMap func(parent *bst.Node, codeWords map[byte]string)
 	codeWords := make(map[byte]string)
 
-	codewordsCreate = func(parent *bst.Node) {
+	makeBitsMap = func(parent *bst.Node, codeWords map[byte]string) {
 		if parent.Symbol == -1 {
 			parent.Left.Codeword = parent.Codeword + "0"
 			parent.Right.Codeword = parent.Codeword + "1"
-			fmt.Println("Aaaa")
-			codewordsCreate(parent.Left)
-			codewordsCreate(parent.Right)
-		} else {
+			makeBitsMap(parent.Left, codeWords)
+			makeBitsMap(parent.Right, codeWords)
+		} else if parent.Symbol != -2 {
 			codeWords[byte(parent.Symbol)] = parent.Codeword
 		}
 	}
 
-	codewordsCreate(ns[0])
+	makeBitsMap(ns[0], codeWords)
 
 	return codeWords
 }
